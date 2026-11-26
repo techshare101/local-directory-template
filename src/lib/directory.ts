@@ -11,20 +11,24 @@ export const DIRECTORY = {
   region: SITE.region,
 }
 
-// Ordered category slugs (mirrors the reference directory home grid).
+// Ordered category slugs (canonical vertical taxonomy from the reconciled
+// isla data model — the home grid order).
 export const CATEGORY_ORDER = [
+  'restaurant',
+  'colmado',
+  'lodging',
+  'bank',
   'automotive',
-  'beauty-personal-care',
-  'community-government',
-  'education-childcare',
-  'events-entertainment',
-  'fitness-recreation',
-  'food-drink',
-  'health-medical',
-  'home-trade-services',
-  'other-services',
-  'pets-animals',
-  'professional-services',
+  'attraction',
+  'sports-recreation',
+  'beauty-wellness',
+  'health-pharmacy',
+  'tours',
+  'local-services',
+  'shopping',
+  'government',
+  'worship',
+  'education',
 ]
 
 export function slugify(s: string): string {

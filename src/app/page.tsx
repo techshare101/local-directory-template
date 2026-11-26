@@ -1,8 +1,9 @@
 import Link from 'next/link'
-import { Search, Store } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { getHome } from '@/lib/data'
 import { CATEGORY_ORDER } from '@/lib/directory'
 import { SITE } from '@/lib/site.config'
+import { CategoryIcon } from '@/components/icons'
 import type { Business } from '@/lib/database.types'
 
 export const dynamic = 'force-dynamic'
@@ -79,7 +80,7 @@ export default async function Home() {
               className="group flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 transition hover:border-emerald-500 hover:shadow-sm"
             >
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-700 group-hover:bg-emerald-50 group-hover:text-emerald-600">
-                <Store size={18} />
+                <CategoryIcon id={c.icon || 'map-pin'} className="h-5 w-5" />
               </span>
               <span className="flex flex-col">
                 <span className="text-sm font-semibold text-slate-900">{c.name}</span>
