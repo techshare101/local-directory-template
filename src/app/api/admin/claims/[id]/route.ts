@@ -4,6 +4,8 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { isAdmin } from '@/lib/admin-auth'
 import { listClaims, reviewClaim } from '@/lib/data'
 import { issueOwnerToken } from '@/lib/owner'
+import { sendOwnerLink } from '@/lib/whatsapp'
+import { SITE } from '@/lib/site.config'
 
 export async function POST(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   // Admin gate — only a logged-in admin (holds ADMIN_TOKEN cookie) may review.
@@ -44,11 +46,26 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
     const { error } = await supabase.from(TABLES.businesses).update(patch).eq('id', claim.business_id)
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-    // Mint the owner's dashboard link. Send /owner/<token> to the owner over
-    // WhatsApp — that is their password-less access to edit profile + photos.
+    // Mint the owner's dashboard link, then try to deliver it over WhatsApp.
     try {
       const token = await issueOwnerToken(claim.business_id)
-      return NextResponse.json({ ok: true, ownerPath: `/owner/${token}` })
+      const { data: biz } = await supabase
+        .from(TABLES.businesses)
+        .select('name')
+        .eq('id', claim.business_id)
+        .single()
+      // Prefer the host the operator is actually using (canonical alias), so a
+      // stale NEXT_PUBLIC_SITE_URL can never put localhost in an owner link.
+      const host = _req.headers.get('x-forwarded-host') || _req.headers.get('host') || ''
+      const proto = _req.headers.get('x-forwarded-proto') || 'https'
+      const base = host ? `${proto}://${host}` : SITE.domain.replace(/\/$/, '')
+      const ownerUrl = `${base}/owner/${token}`
+      const whatsapp = await sendOwnerLink({
+        to: claim.whatsapp || claim.phone || '',
+        businessName: biz?.name || 'tu negocio',
+        url: ownerUrl,
+      })
+      return NextResponse.json({ ok: true, ownerPath: `/owner/${token}`, ownerUrl, whatsapp })
     } catch (e) {
       return NextResponse.json(
         { ok: true, warning: `Claim approved but owner link failed: ${e instanceof Error ? e.message : 'unknown'}` },

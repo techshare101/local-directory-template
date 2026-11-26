@@ -8,6 +8,7 @@ export function ClaimActions({ claimId }: { claimId: string }) {
   const router = useRouter()
   const [busy, setBusy] = useState<'approve' | 'reject' | null>(null)
   const [ownerPath, setOwnerPath] = useState<string | null>(null)
+  const [wa, setWa] = useState<{ sent: boolean; channel: string; detail: string } | null>(null)
   const [copied, setCopied] = useState(false)
 
   async function act(action: 'approve' | 'reject') {
@@ -19,6 +20,7 @@ export function ClaimActions({ claimId }: { claimId: string }) {
     })
     const data = await res.json().catch(() => ({}))
     if (data?.ownerPath) setOwnerPath(data.ownerPath)
+    if (data?.whatsapp) setWa(data.whatsapp)
     setBusy(null)
     router.refresh()
   }
@@ -43,6 +45,20 @@ export function ClaimActions({ claimId }: { claimId: string }) {
         {busy === 'reject' ? 'Rejecting…' : 'Reject'}
       </button>
       </div>
+
+      {wa && (
+        <div
+          className={`mt-3 rounded-xl border p-3 text-sm ${
+            wa.sent
+              ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
+              : 'border-amber-200 bg-amber-50 text-amber-800'
+          }`}
+        >
+          {wa.sent ? '✓ WhatsApp sent — ' : '⚠ WhatsApp not sent — '}
+          {wa.detail}
+          {!wa.sent && <span className="mt-1 block text-xs">Copy the link below and send it manually.</span>}
+        </div>
+      )}
 
       {ownerPath && (
         <div className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50 p-3">
