@@ -6,8 +6,8 @@ export const dynamic = 'force-dynamic'
 export default async function PostsPage() {
   const supabase = await createClient()
   const { data: posts } = await supabase
-    .from('posts')
-    .select('*, businesses(name)')
+    .from('isabela_posts')
+    .select('*, isabela_businesses(name)')
     .order('published_at', { ascending: false })
   const list = posts ?? []
   return (

@@ -16,7 +16,7 @@ export function EnquiryForm({ businessId, businessName }: { businessId: string; 
     setError(null)
     const fd = new FormData(e.currentTarget)
     const supabase = createClient()
-    const { error: err } = await supabase.from('enquiries').insert({
+    const { error: err } = await supabase.from('isabela_enquiries').insert({
       business_id: businessId,
       name: String(fd.get('name') || ''),
       email: String(fd.get('email') || ''),

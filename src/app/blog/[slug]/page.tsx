@@ -8,8 +8,8 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
   const { slug } = await params
   const supabase = await createClient()
   const { data: post } = await supabase
-    .from('posts')
-    .select('*, businesses(name, slug)')
+    .from('isabela_posts')
+    .select('*, isabela_businesses(name, slug)')
     .eq('id', slug)
     .single()
   if (!post) notFound()

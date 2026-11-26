@@ -15,7 +15,7 @@ export function AddBusinessForm({ categories, locations }: { categories: Categor
     setError(null)
     const fd = new FormData(e.currentTarget)
     const supabase = createClient()
-    const { error: err } = await supabase.from('submissions').insert({
+    const { error: err } = await supabase.from('isabela_submissions').insert({
       business_name: String(fd.get('businessName') || ''),
       category_id: String(fd.get('category') || '') || null,
       location_id: String(fd.get('location') || '') || null,
