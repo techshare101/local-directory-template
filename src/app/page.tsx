@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic'
 
 export default async function Home() {
   const locale = await getLocale()
-  const { categories, businesses, posts } = await getHome()
+  const { categories, businesses, posts, events } = await getHome()
 
   const counts: Record<string, number> = {}
   for (const b of businesses) {
@@ -21,6 +21,10 @@ export default async function Home() {
     (a, b) => (CATEGORY_ORDER.indexOf(a.id) - CATEGORY_ORDER.indexOf(b.id)) || (a.sort_order - b.sort_order)
   )
   const fresh = businesses.slice(0, 8)
+  const now = Date.now()
+  const upcomingEvents = events
+    .filter((ev) => new Date(ev.starts_at).getTime() >= now)
+    .sort((a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime())
 
   return (
     <div className="space-y-12">
@@ -150,6 +154,48 @@ export default async function Home() {
                   </div>
                   <h3 className="mt-1.5 font-semibold text-slate-900 group-hover:text-emerald-800">{p.title}</h3>
                   <p className="mt-1 line-clamp-2 text-sm text-slate-500">{p.excerpt}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+      {/* Upcoming events — with pictures */}
+      {upcomingEvents.length > 0 && (
+        <section>
+          <div className="mb-4 flex items-end justify-between">
+            <div>
+              <h2 className="text-xl font-bold text-slate-900">{SITE.eventsTitle}</h2>
+              <p className="text-sm text-slate-500">{SITE.eventsSubtitle}</p>
+            </div>
+            <Link href="/events" className="text-sm font-semibold text-emerald-700 hover:underline">
+              {SITE.eventsAllLabel}
+            </Link>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {upcomingEvents.slice(0, 6).map((ev) => (
+              <Link
+                key={ev.id}
+                href={`/events/${ev.id}`}
+                className="group overflow-hidden rounded-xl border border-slate-200 bg-white transition hover:border-emerald-500 hover:shadow-sm"
+              >
+                {ev.cover ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={ev.cover} alt={ev.title} className="h-40 w-full object-cover transition group-hover:opacity-90" />
+                ) : (
+                  <div className="h-40 w-full bg-emerald-950/90" />
+                )}
+                <div className="p-4">
+                  <div className="text-xs font-semibold text-emerald-700">
+                    {new Date(ev.starts_at).toLocaleDateString(locale === 'es' ? 'es-DO' : 'en-US', {
+                      weekday: 'short',
+                      month: 'short',
+                      day: 'numeric',
+                    })}
+                  </div>
+                  <h3 className="mt-1 font-semibold text-slate-900 group-hover:text-emerald-800">{ev.title}</h3>
+                  <p className="mt-1 line-clamp-2 text-sm text-slate-500">{ev.description}</p>
+                  {ev.venue && <div className="mt-2 text-xs text-slate-500">{ev.venue}</div>}
                 </div>
               </Link>
             ))}
