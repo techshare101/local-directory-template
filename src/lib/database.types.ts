@@ -59,6 +59,11 @@ export interface Business {
   reviews_count?: number | null
   source?: string
   schema_type?: string
+  whatsapp?: string
+  image_gallery?: string[]
+  owner_token?: string | null
+  owner_token_expires?: string | null
+  updated_at?: string
 }
 
 export interface Offer {

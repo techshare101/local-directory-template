@@ -61,9 +61,21 @@ export default async function AdminClaimsPage() {
         <>
           <h2 className="pt-4 text-sm font-semibold text-slate-500">Recently approved</h2>
           {reviewed.slice(0, 10).map((c) => (
-            <div key={c.id} className="flex items-center justify-between border-b border-slate-200 py-2 text-sm">
+            <div key={c.id} className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 py-2 text-sm">
               <span className="text-slate-700">{c.business?.name ?? 'Unknown'}</span>
-              <span className="font-semibold text-emerald-600">approved</span>
+              <span className="flex items-center gap-3">
+                {c.business?.owner_token && (
+                  <a
+                    href={`/owner/${c.business.owner_token}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-xs font-semibold text-emerald-700 hover:underline"
+                  >
+                    owner dashboard →
+                  </a>
+                )}
+                <span className="font-semibold text-emerald-600">approved</span>
+              </span>
             </div>
           ))}
         </>

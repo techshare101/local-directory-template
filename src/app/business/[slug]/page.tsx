@@ -1,9 +1,10 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { BadgeCheck, MapPin, Phone, Mail, Globe, Tag, CalendarDays, FileText, Navigation } from 'lucide-react'
+import { BadgeCheck, MapPin, Phone, Mail, Globe, Tag, CalendarDays, FileText, Navigation, Clock } from 'lucide-react'
 import { getBusinessBySlug } from '@/lib/data'
 import { EnquiryForm } from '@/components/enquiry-form'
 import { SingleMap } from '@/components/single-map-dynamic'
+import { DAYS } from '@/lib/hours'
 import { getLocale, pick } from '@/lib/server-locale'
 
 export const dynamic = 'force-dynamic'
@@ -39,6 +40,15 @@ export default async function BusinessPage({ params }: { params: Promise<{ slug:
   const services: string[] = Array.isArray(b.services)
     ? b.services.filter((s: unknown): s is string => Boolean(s))
     : []
+
+  const hoursObj =
+    b.hours && typeof b.hours === 'object' && !Array.isArray(b.hours)
+      ? (b.hours as Record<string, { open?: string; close?: string; closed?: boolean }>)
+      : {}
+  const hourRows = DAYS.filter((d) => hoursObj[d.key]).map((d) => ({
+    label: locale === 'es' ? d.es : d.en,
+    row: hoursObj[d.key],
+  }))
 
   return (
     <div className="space-y-8">
@@ -107,6 +117,24 @@ export default async function BusinessPage({ params }: { params: Promise<{ slug:
               </div>
             )}
           </InfoCard>
+
+          {/* Gallery — owner-uploaded photos */}
+          {Array.isArray(b.image_gallery) && b.image_gallery.length > 0 && (
+            <section>
+              <h2 className="text-xl font-bold text-slate-900">{locale === 'es' ? 'Fotos' : 'Photos'}</h2>
+              <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                {b.image_gallery.slice(0, 6).map((url: string) => (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    key={url}
+                    src={url}
+                    alt={b.name}
+                    className="h-36 w-full rounded-xl border border-slate-200 object-cover"
+                  />
+                ))}
+              </div>
+            </section>
+          )}
 
           {/* Offers */}
           {offers.length > 0 && (
@@ -229,6 +257,18 @@ export default async function BusinessPage({ params }: { params: Promise<{ slug:
                   <a href={`mailto:${b.email}`} className="hover:text-emerald-700">{b.email}</a>
                 </li>
               )}
+              {b.whatsapp && (
+                <li>
+                  <a
+                    href={`https://wa.me/${b.whatsapp.replace(/[^\d]/g, '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700"
+                  >
+                    {locale === 'es' ? 'Escribir por WhatsApp' : 'Message on WhatsApp'}
+                  </a>
+                </li>
+              )}
               {b.website && (
                 <li className="flex items-center gap-2">
                   <Globe size={15} className="text-slate-400" />
@@ -247,9 +287,26 @@ export default async function BusinessPage({ params }: { params: Promise<{ slug:
                 </li>
               )}
             </ul>
+            {hourRows.length > 0 && (
+              <div className="mt-3 border-t border-slate-100 pt-3">
+                <div className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  <Clock size={13} /> {locale === 'es' ? 'Horario' : 'Opening hours'}
+                </div>
+                <div className="space-y-0.5">
+                  {hourRows.map(({ label, row }) => (
+                    <div key={label} className="flex justify-between text-xs text-slate-600">
+                      <span>{label}</span>
+                      <span className={row.closed ? 'text-rose-600' : 'font-medium text-slate-800'}>
+                        {row.closed
+                          ? locale === 'es' ? 'Cerrado' : 'Closed'
+                          : `${row.open || '—'}–${row.close || '—'}`}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </InfoCard>
-
-          {/* Ad slot — monetizable inventory */}
           <section className="rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 p-5 text-center">
             <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
               {locale === 'es' ? 'Publicidad' : 'Advertisement'}

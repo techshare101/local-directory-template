@@ -145,21 +145,26 @@ export async function createClaimSubmission(input: {
   website?: string
   notes?: string
 }) {
-  const supabase = await createClient()
-  // anon has only an INSERT policy on claims — do not chain .select(), which
-  // would need a SELECT policy it does not have.
-  const { error } = await supabase.from(TABLES.claims).insert({
-    business_id: input.businessId,
-    contact_name: input.contactName,
-    phone: input.phone,
-    whatsapp: input.whatsapp ?? '',
-    email: input.email ?? '',
-    website: input.website ?? '',
-    notes: input.notes ?? '',
-    status: 'pending',
-  })
+  // Service-role insert so we can read back the generated claim id in the same
+  // request. Anon has INSERT-only RLS on claims, so an anon insert cannot
+  // return the row — and the API must answer with the real claim id.
+  const supabase = createAdminClient()
+  const { data, error } = await supabase
+    .from(TABLES.claims)
+    .insert({
+      business_id: input.businessId,
+      contact_name: input.contactName,
+      phone: input.phone,
+      whatsapp: input.whatsapp ?? '',
+      email: input.email ?? '',
+      website: input.website ?? '',
+      notes: input.notes ?? '',
+      status: 'pending',
+    })
+    .select('id')
+    .single()
   if (error) throw new Error(error.message)
-  return { id: input.businessId }
+  return { id: data.id as string }
 }
 
 export type ClaimRow = {
@@ -174,7 +179,7 @@ export type ClaimRow = {
   status: 'pending' | 'approved' | 'rejected'
   submitted_at: string
   reviewed_at: string | null
-  business: { slug: string; name: string; category_id: string | null } | null
+  business: { slug: string; name: string; category_id: string | null; owner_token?: string | null } | null
 }
 
 export async function listClaims(status?: 'pending' | 'approved' | 'rejected') {
@@ -183,7 +188,7 @@ export async function listClaims(status?: 'pending' | 'approved' | 'rejected') {
   const supabase = createAdminClient()
   let q = supabase
     .from(TABLES.claims)
-    .select(`*, ${TABLES.businesses}(slug, name, category_id)`)
+    .select(`*, ${TABLES.businesses}(slug, name, category_id, owner_token)`)
     .order('submitted_at', { ascending: false })
   if (status) q = q.eq('status', status)
   const { data } = await q
