@@ -21,7 +21,7 @@ export default async function Home() {
   return (
     <div className="space-y-12">
       {/* Hero */}
-      <section className="relative overflow-hidden rounded-3xl bg-emerald-950">
+      <section className="relative -mx-4 overflow-hidden bg-emerald-950 sm:-mx-6 lg:-mx-10">
         <div
           className="pointer-events-none absolute inset-0 opacity-40"
           style={{
