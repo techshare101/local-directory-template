@@ -1,13 +1,14 @@
-// Central constants for the directory instance.
-// White-label: change these per deployment.
+import { SITE } from '@/lib/site.config'
+
+// Re-export the instance identity so existing imports keep working.
+// White-label: change once in src/lib/site.config.ts, not here.
 export const DIRECTORY = {
-  name: 'Villa Isabela Directory',
-  city: 'Villa Isabela',
-  country: 'Dominican Republic',
-  tagline: 'Find the best local services in your area',
-  domain: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
-  // number formatting / loyalty marker used across pages
-  region: 'Puerto Plata Province, Dominican Republic',
+  name: SITE.name,
+  city: SITE.city,
+  country: SITE.country,
+  tagline: SITE.tagline,
+  domain: SITE.domain,
+  region: SITE.region,
 }
 
 // Ordered category slugs (mirrors the reference directory home grid).

@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getCategoryAndLocations } from '@/lib/data'
 import { BusinessCard } from '@/components/business-card'
+import { SITE } from '@/lib/site.config'
 
 export const dynamic = 'force-dynamic'
 
@@ -14,7 +15,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
     <div className="space-y-6">
       <div>
         <Link href="/search" className="text-sm font-medium text-emerald-700 hover:underline">← Back to search</Link>
-        <h1 className="mt-1 text-3xl font-bold text-slate-900">Best {category.name} in Villa Isabela</h1>
+        <h1 className="mt-1 text-3xl font-bold text-slate-900">Best {category.name} in {SITE.city}</h1>
         <p className="mt-1 text-slate-500">{category.description}</p>
       </div>
 

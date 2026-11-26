@@ -1,15 +1,23 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+import { TABLES } from '@/lib/tables'
 
 export const dynamic = 'force-dynamic'
 
 export default async function PostsPage() {
   const supabase = await createClient()
   const { data: posts } = await supabase
-    .from('isabela_posts')
-    .select('*, isabela_businesses(name)')
+    .from(TABLES.posts)
+    .select(`*, ${TABLES.businesses}(name)`)
     .order('published_at', { ascending: false })
-  const list = posts ?? []
+  const list = (posts ?? []) as unknown as (Record<string, unknown> & {
+    id: string
+    title: string
+    excerpt: string
+    cover: string
+    published_at: string
+    businesses: { name: string } | null
+  })[]
   return (
     <div className="space-y-6">
       <div>

@@ -1,8 +1,10 @@
+import { SITE } from '@/lib/site.config'
+
 export default function TermsPage() {
   return (
     <div className="prose prose-slate mx-auto max-w-2xl">
       <h1>Terms of Service</h1>
-      <p>By using Villa Isabela Directory you agree to these terms.</p>
+      <p>By using {SITE.name} you agree to these terms.</p>
       <h2>Listing content</h2>
       <p>
         Listings are provided for informational purposes. Business owners are responsible for the accuracy of

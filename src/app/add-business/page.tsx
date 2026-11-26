@@ -1,6 +1,7 @@
 import { getCategories } from '@/lib/data'
 import { getLocations } from '@/lib/locations'
 import { AddBusinessForm } from '@/components/add-business-form'
+import { SITE } from '@/lib/site.config'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,7 +12,7 @@ export default async function AddBusinessPage() {
       <div>
         <h1 className="text-3xl font-bold text-slate-900">Add your business</h1>
         <p className="mt-1 text-slate-500">
-          Get discovered in Villa Isabela. Free listing, no credit card required.
+          {SITE.addBusinessSubtitle}
         </p>
       </div>
       <AddBusinessForm categories={categories} locations={locations} />

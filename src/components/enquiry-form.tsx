@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { TABLES } from '@/lib/tables'
 
 export function EnquiryForm({ businessId, businessName }: { businessId: string; businessName: string }) {
   const [sent, setSent] = useState(false)
@@ -16,7 +17,7 @@ export function EnquiryForm({ businessId, businessName }: { businessId: string; 
     setError(null)
     const fd = new FormData(e.currentTarget)
     const supabase = createClient()
-    const { error: err } = await supabase.from('isabela_enquiries').insert({
+    const { error: err } = await supabase.from(TABLES.enquiries).insert({
       business_id: businessId,
       name: String(fd.get('name') || ''),
       email: String(fd.get('email') || ''),

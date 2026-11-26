@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { MapPin } from 'lucide-react'
+import { SITE } from '@/lib/site.config'
 
 export function Header() {
   return (
@@ -10,20 +11,20 @@ export function Header() {
             <MapPin size={18} strokeWidth={2} />
           </span>
           <span className="flex flex-col leading-tight">
-            <span className="text-sm font-bold text-slate-900">Isabela Directory</span>
-            <span className="text-[11px] text-slate-500">Villa Isabela, DR</span>
+            <span className="text-sm font-bold text-slate-900">{SITE.shortName}</span>
+            <span className="text-[11px] text-slate-500">{SITE.city}, {SITE.country}</span>
           </span>
         </Link>
-        <nav className="flex items-center gap-1 sm:gap-2 text-sm font-medium text-slate-600">
-          <Link href="/categories" className="rounded-lg px-3 py-2 hover:bg-slate-100 hover:text-slate-900">Categories</Link>
-          <Link href="/search" className="rounded-lg px-3 py-2 hover:bg-slate-100 hover:text-slate-900">Search</Link>
-          <Link href="/blog" className="hidden rounded-lg px-3 py-2 hover:bg-slate-100 hover:text-slate-900 sm:inline">Spotlight</Link>
-          <Link href="/events" className="hidden rounded-lg px-3 py-2 hover:bg-slate-100 hover:text-slate-900 sm:inline">Events</Link>
+        <nav className="flex items-center gap-1 text-sm font-medium text-slate-600 sm:gap-2">
+          <Link href="/categories" className="rounded-lg px-3 py-2 hover:bg-slate-100 hover:text-slate-900">{SITE.navCategories}</Link>
+          <Link href="/search" className="rounded-lg px-3 py-2 hover:bg-slate-100 hover:text-slate-900">{SITE.navSearch}</Link>
+          <Link href="/blog" className="hidden rounded-lg px-3 py-2 hover:bg-slate-100 hover:text-slate-900 sm:inline">{SITE.navSpotlight}</Link>
+          <Link href="/events" className="hidden rounded-lg px-3 py-2 hover:bg-slate-100 hover:text-slate-900 sm:inline">{SITE.navEvents}</Link>
           <Link
             href="/add-business"
             className="rounded-lg bg-emerald-600 px-3 py-2 text-white hover:bg-emerald-700"
           >
-            Add your business
+            {SITE.ctaAddBusiness}
           </Link>
         </nav>
       </div>

@@ -1,20 +1,30 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+import { TABLES } from '@/lib/tables'
+import { SITE } from '@/lib/site.config'
 
 export const dynamic = 'force-dynamic'
 
 export default async function EventsPage() {
   const supabase = await createClient()
   const { data: events } = await supabase
-    .from('isabela_events')
-    .select('*, isabela_businesses(name)')
+    .from(TABLES.events)
+    .select(`*, ${TABLES.businesses}(name)`)
     .order('starts_at', { ascending: true })
-  const list = events ?? []
+  const list = (events ?? []) as unknown as (Record<string, unknown> & {
+    id: string
+    title: string
+    starts_at: string
+    description: string
+    venue: string
+    cover: string
+    businesses: { name: string } | null
+  })[]
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-slate-900">Upcoming events</h1>
-        <p className="mt-1 text-slate-500">Don&apos;t miss what&apos;s happening in Villa Isabela.</p>
+        <p className="mt-1 text-slate-500">Don&apos;t miss what&apos;s happening in {SITE.city}.</p>
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {list.map((ev) => (

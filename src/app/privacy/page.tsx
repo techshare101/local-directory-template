@@ -1,8 +1,12 @@
+import { SITE } from '@/lib/site.config'
+
+const contactHost = SITE.domain.replace(/^https?:\/\//, '') || 'example.com'
+
 export default function PrivacyPage() {
   return (
     <div className="prose prose-slate mx-auto max-w-2xl">
       <h1>Privacy Policy</h1>
-      <p>Villa Isabela Directory ("we") respects your privacy. This policy explains what we collect and why.</p>
+      <p>{SITE.name} ("we") respects your privacy. This policy explains what we collect and why.</p>
       <h2>What we collect</h2>
       <p>
         When you submit a business listing or send an enquiry, we collect the details you provide (business
@@ -14,7 +18,7 @@ export default function PrivacyPage() {
       <h2>Consent</h2>
       <p>Enquiries and listings require your explicit consent, captured at the point of submission.</p>
       <h2>Contact</h2>
-      <p>Questions? Contact us at <a href="mailto:privacy@villa-isabela.local">privacy@villa-isabela.local</a>.</p>
+      <p>Questions? Contact us at <a href={`mailto:privacy@${contactHost}`}>privacy@{contactHost}</a>.</p>
     </div>
   )
 }

@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { getCategories } from '@/lib/data'
 import { CATEGORY_ORDER } from '@/lib/directory'
 import { CategoryIcon } from '@/components/icons'
+import { SITE } from '@/lib/site.config'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,7 +16,7 @@ export default async function CategoriesPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-slate-900">All categories</h1>
-        <p className="mt-1 text-slate-500">Browse the Villa Isabela directory by category.</p>
+        <p className="mt-1 text-slate-500">{SITE.categoriesSubtitle}</p>
       </div>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
         {ordered.map((c) => (

@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { SITE } from '@/lib/site.config'
 
 export default function PricingPage() {
   const plans = [    {
@@ -22,7 +23,7 @@ export default function PricingPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-8">
       <div className="text-center">
-        <h1 className="text-3xl font-bold text-slate-900">Get discovered in Villa Isabela</h1>
+        <h1 className="text-3xl font-bold text-slate-900">{SITE.pricingHeadline}</h1>
         <p className="mt-2 text-slate-500">Simple plans to help your business stand out.</p>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">

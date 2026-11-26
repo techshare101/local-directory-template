@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
+import { SEO } from "@/lib/site.config";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,11 +17,11 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Villa Isabela Directory — Find local businesses",
-    template: "%s | Villa Isabela Directory",
+    default: SEO.titleDefault,
+    template: SEO.titleTemplate,
   },
-  description:
-    "Find the best local services in Villa Isabela, Dominican Republic. Browse categories, compare services and support local businesses.",
+  description: SEO.description,
+  keywords: SEO.keywords,
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
