@@ -71,7 +71,7 @@ export default async function Home() {
             Browse all categories
           </Link>
         </div>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
           {orderedCategories.map((c) => (
             <Link
               key={c.id}
@@ -102,7 +102,7 @@ export default async function Home() {
               View all
             </Link>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
             {fresh.map((b) => (
               <BusinessTile key={b.id} b={b} />
             ))}
