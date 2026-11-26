@@ -17,4 +17,5 @@ export const TABLES = {
   events: tb('events'),
   enquiries: tb('enquiries'),
   submissions: tb('submissions'),
+  claims: tb('claims'),
 } as const

@@ -1,8 +1,10 @@
 import Link from 'next/link'
 import { BadgeCheck } from 'lucide-react'
 import type { Business } from '@/lib/database.types'
+import type { Locale } from '@/lib/locale'
 
-export function BusinessCard({ b }: { b: Business }) {
+export function BusinessCard({ b, locale = 'en' }: { b: Business; locale?: Locale }) {
+  const desc = locale === 'es' ? b.description_es || b.description : b.description
   return (
     <Link
       href={`/business/${b.slug}`}
@@ -27,8 +29,8 @@ export function BusinessCard({ b }: { b: Business }) {
             </span>
           )}
         </div>
-        {b.description && (
-          <p className="mt-1.5 line-clamp-2 text-sm text-slate-500">{b.description}</p>
+        {desc && (
+          <p className="mt-1.5 line-clamp-2 text-sm text-slate-500">{desc}</p>
         )}
         {b.price_min && <p className="mt-2 text-xs font-semibold text-slate-700">{b.price_min}</p>}
       </div>

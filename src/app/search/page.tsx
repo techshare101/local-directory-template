@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { getCategories, searchBusinesses } from '@/lib/data'
 import { BusinessCard } from '@/components/business-card'
+import { getLocale } from '@/lib/server-locale'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,6 +13,7 @@ export default async function SearchPage({
   const sp = await searchParams
   const q = sp.q || ''
   const cat = sp.cat || ''
+  const locale = await getLocale()
   const [categories, businesses] = await Promise.all([
     getCategories(),
     searchBusinesses(q, cat),
@@ -49,7 +51,7 @@ export default async function SearchPage({
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {businesses.map((b) => (
-            <BusinessCard key={b.id} b={b} />
+            <BusinessCard key={b.id} b={b} locale={locale} />
           ))}
         </div>
       )}

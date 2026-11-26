@@ -3,14 +3,21 @@ import { notFound } from 'next/navigation'
 import { BadgeCheck, MapPin, Phone, Mail, Globe, Clock, Tag, CalendarDays, FileText } from 'lucide-react'
 import { getBusinessBySlug } from '@/lib/data'
 import { EnquiryForm } from '@/components/enquiry-form'
+import { getLocale, pick } from '@/lib/server-locale'
 
 export const dynamic = 'force-dynamic'
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
+  const locale = await getLocale()
   const data = await getBusinessBySlug(slug)
   if (!data) return { title: 'Business not found' }
-  return { title: data.business.name, description: data.business.description }
+  const desc = pick(
+    { en: data.business.description_en, es: data.business.description_es },
+    locale,
+    data.business.description,
+  )
+  return { title: data.business.name, description: desc }
 }
 
 async function getData({ params }: { params: Promise<{ slug: string }> }) {
@@ -21,7 +28,12 @@ async function getData({ params }: { params: Promise<{ slug: string }> }) {
 export default async function BusinessPage({ params }: { params: Promise<{ slug: string }> }) {
   const data = await getData({ params })
   if (!data) notFound()
+  const locale = await getLocale()
   const { business: b, category, location, offers, posts, events } = data
+
+  const desc = pick({ en: b.description_en, es: b.description_es }, locale, b.description)
+  const addr = pick({ en: b.address_en, es: b.address_es }, locale, b.address)
+  const catName = pick({ en: category?.name_en, es: category?.name_es }, locale, category?.name || 'Business')
 
   const services: string[] = Array.isArray(b.services)
     ? b.services.filter((s: unknown): s is string => Boolean(s))
@@ -44,7 +56,7 @@ export default async function BusinessPage({ params }: { params: Promise<{ slug:
               href={`/category/${category?.id || ''}`}
               className="rounded-full bg-white/15 px-3 py-1 text-xs font-semibold text-white backdrop-blur hover:bg-white/25"
             >
-              {category?.name || 'Business'}
+              {catName}
             </Link>
             {location && (
               <span className="flex items-center gap-1 rounded-full bg-white/15 px-3 py-1 text-xs text-white backdrop-blur">
@@ -69,7 +81,7 @@ export default async function BusinessPage({ params }: { params: Promise<{ slug:
         <div className="space-y-6">
           {/* Quick answers / about */}
           <InfoCard title="About">
-            <p className="text-slate-700">{b.description}</p>
+            <p className="text-slate-700">{desc}</p>
             {services.length > 0 && (
               <div className="mt-4">
                 <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Services</h4>
@@ -175,10 +187,15 @@ export default async function BusinessPage({ params }: { params: Promise<{ slug:
                   <a href={`https://${b.website.replace(/^https?:\/\//, '')}`} target="_blank" rel="noopener noreferrer" className="hover:text-emerald-700">{b.website}</a>
                 </li>
               )}
-              {b.address && (
+              {b.address ? (
                 <li className="flex items-start gap-2">
                   <MapPin size={15} className="mt-0.5 text-slate-400" />
-                  <span>{b.address}</span>
+                  <span>{addr}</span>
+                </li>
+              ) : (
+                <li className="flex items-start gap-2">
+                  <MapPin size={15} className="mt-0.5 text-slate-400" />
+                  <span className="text-slate-400">{locale === 'es' ? 'Aún no publicado' : 'Address not listed yet'}</span>
                 </li>
               )}
             </ul>
@@ -188,6 +205,21 @@ export default async function BusinessPage({ params }: { params: Promise<{ slug:
             <p className="mb-3 text-sm text-slate-600">Contact {b.name} directly for quotes or questions.</p>
             <EnquiryForm businessId={b.id} businessName={b.name} />
           </InfoCard>
+
+          {!b.claimed && (
+            <section className="rounded-xl border border-emerald-200 bg-emerald-50 p-5">
+              <h2 className="text-lg font-bold text-slate-900">Is this your business?</h2>
+              <p className="mt-1 text-sm text-slate-600">
+                Claim it for free to control your real information — phone, hours, WhatsApp and location.
+              </p>
+              <Link
+                href={`/claim?listing=${b.slug}`}
+                className="mt-4 inline-block rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700"
+              >
+                Claim this business
+              </Link>
+            </section>
+          )}
         </div>
       </div>
     </div>

@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { TABLES } from '@/lib/tables'
 import type { Business } from '@/lib/database.types'
-
 export async function getCategories() {
   const supabase = await createClient()
   const { data } = await supabase
@@ -87,4 +87,82 @@ export async function getCategoryAndLocations(categoryId: string) {
       .order('created_at', { ascending: false }),
   ])
   return { category: category ?? null, locations: locations ?? [], businesses: businesses ?? [] }
+}
+
+// ============================================================================
+// CLAIMING (manual review, ported from isla Phase 2 — Option A)
+// ============================================================================
+
+export async function getClaimableListings() {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from(TABLES.businesses)
+    .select('slug, name')
+    .eq('status', 'listed')
+    .order('name', { ascending: true })
+  return (data ?? []) as { slug: string; name: string }[]
+}
+
+export async function createClaimSubmission(input: {
+  businessId: string
+  contactName: string
+  phone: string
+  whatsapp?: string
+  email?: string
+  website?: string
+  notes?: string
+}) {
+  const supabase = await createClient()
+  // anon has only an INSERT policy on claims — do not chain .select(), which
+  // would need a SELECT policy it does not have.
+  const { error } = await supabase.from(TABLES.claims).insert({
+    business_id: input.businessId,
+    contact_name: input.contactName,
+    phone: input.phone,
+    whatsapp: input.whatsapp ?? '',
+    email: input.email ?? '',
+    website: input.website ?? '',
+    notes: input.notes ?? '',
+    status: 'pending',
+  })
+  if (error) throw new Error(error.message)
+  return { id: input.businessId }
+}
+
+export type ClaimRow = {
+  id: string
+  business_id: string
+  contact_name: string
+  phone: string
+  whatsapp: string
+  email: string
+  website: string
+  notes: string
+  status: 'pending' | 'approved' | 'rejected'
+  submitted_at: string
+  reviewed_at: string | null
+  business: { slug: string; name: string; category_id: string | null } | null
+}
+
+export async function listClaims(status?: 'pending' | 'approved' | 'rejected') {
+  // service-role only: claims carry owner PII and must never be readable via
+  // the anon key. Callers must sit behind the ADMIN_TOKEN gate.
+  const supabase = createAdminClient()
+  let q = supabase
+    .from(TABLES.claims)
+    .select(`*, ${TABLES.businesses}(slug, name, category_id)`)
+    .order('submitted_at', { ascending: false })
+  if (status) q = q.eq('status', status)
+  const { data } = await q
+  return (data ?? []) as unknown as ClaimRow[]
+}
+
+export async function reviewClaim(claimId: string, action: 'approve' | 'reject') {
+  // service-role (RLS bypass) so admin review is not subject to anon policies.
+  const supabase = createAdminClient()
+  const { error } = await supabase
+    .from(TABLES.claims)
+    .update({ status: action === 'approve' ? 'approved' : 'rejected', reviewed_at: new Date().toISOString() })
+    .eq('id', claimId)
+  if (error) throw new Error(error.message)
 }

@@ -4,11 +4,13 @@ import { getHome } from '@/lib/data'
 import { CATEGORY_ORDER } from '@/lib/directory'
 import { SITE } from '@/lib/site.config'
 import { CategoryIcon } from '@/components/icons'
+import { getLocale, pick } from '@/lib/server-locale'
 import type { Business } from '@/lib/database.types'
 
 export const dynamic = 'force-dynamic'
 
 export default async function Home() {
+  const locale = await getLocale()
   const { categories, businesses } = await getHome()
 
   const counts: Record<string, number> = {}
@@ -83,7 +85,7 @@ export default async function Home() {
                 <CategoryIcon id={c.icon || 'map-pin'} className="h-5 w-5" />
               </span>
               <span className="flex flex-col">
-                <span className="text-sm font-semibold text-slate-900">{c.name}</span>
+                <span className="text-sm font-semibold text-slate-900">{pick({ en: c.name_en, es: c.name_es }, locale, c.name)}</span>
                 <span className="text-xs text-slate-500">{counts[c.id] || 0} listings</span>
               </span>
             </Link>
@@ -105,7 +107,7 @@ export default async function Home() {
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
             {fresh.map((b) => (
-              <BusinessTile key={b.id} b={b} />
+              <BusinessTile key={b.id} b={b} locale={locale} />
             ))}
           </div>
         </section>
@@ -123,7 +125,8 @@ function Stat({ value, label }: { value: string; label: string }) {
   )
 }
 
-function BusinessTile({ b }: { b: Business }) {
+function BusinessTile({ b, locale }: { b: Business; locale: 'en' | 'es' }) {
+  const ddesc = pick({ en: b.description_en, es: b.description_es }, locale, b.description)
   return (
     <Link
       href={`/business/${b.slug}`}
@@ -138,7 +141,7 @@ function BusinessTile({ b }: { b: Business }) {
           <h3 className="text-sm font-semibold text-slate-900">{b.name}</h3>
           {b.claimed && <span className="text-[11px] font-semibold text-emerald-700">Claimed</span>}
         </div>
-        <p className="mt-1 line-clamp-2 text-xs text-slate-500">{b.description}</p>
+        <p className="mt-1 line-clamp-2 text-xs text-slate-500">{ddesc}</p>
       </div>
     </Link>
   )

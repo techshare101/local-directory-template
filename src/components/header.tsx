@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { MapPin } from 'lucide-react'
 import { SITE } from '@/lib/site.config'
+import { LanguageToggle } from '@/components/language-toggle'
 
 export function Header() {
   return (
@@ -26,6 +27,7 @@ export function Header() {
           >
             {SITE.ctaAddBusiness}
           </Link>
+          <LanguageToggle />
         </nav>
       </div>
     </header>

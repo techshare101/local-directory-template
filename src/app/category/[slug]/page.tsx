@@ -3,20 +3,24 @@ import { notFound } from 'next/navigation'
 import { getCategoryAndLocations } from '@/lib/data'
 import { BusinessCard } from '@/components/business-card'
 import { SITE } from '@/lib/site.config'
+import { getLocale, pick } from '@/lib/server-locale'
 
 export const dynamic = 'force-dynamic'
 
 export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
+  const locale = await getLocale()
   const { category, locations, businesses } = await getCategoryAndLocations(slug)
   if (!category) notFound()
+  const catName = pick({ en: category.name_en, es: category.name_es }, locale, category.name)
+  const catDesc = pick({ en: category.desc_en, es: category.desc_es }, locale, category.description)
 
   return (
     <div className="space-y-6">
       <div>
         <Link href="/search" className="text-sm font-medium text-emerald-700 hover:underline">← Back to search</Link>
-        <h1 className="mt-1 text-3xl font-bold text-slate-900">Best {category.name} in {SITE.city}</h1>
-        <p className="mt-1 text-slate-500">{category.description}</p>
+        <h1 className="mt-1 text-3xl font-bold text-slate-900">Best {catName} in {SITE.city}</h1>
+        <p className="mt-1 text-slate-500">{catDesc}</p>
       </div>
 
       {locations.length > 0 && (
@@ -41,7 +45,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {businesses.map((b: import('@/lib/database.types').Business) => (
-            <BusinessCard key={b.id} b={b} />
+            <BusinessCard key={b.id} b={b} locale={locale} />
           ))}
         </div>
       )}

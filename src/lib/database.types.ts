@@ -7,12 +7,26 @@ export interface Category {
   description: string
   icon: string
   sort_order: number
+  name_es?: string
+  name_en?: string
+  desc_es?: string
+  desc_en?: string
+  schema_type?: string
+  gradient_from?: string
+  gradient_via?: string
+  gradient_to?: string
 }
 
 export interface Location {
   id: string
   name: string
   region: string
+  slug?: string
+  kind?: string
+  launched?: boolean
+  sort_order?: number
+  latitude?: number | null
+  longitude?: number | null
 }
 
 export interface Business {
@@ -35,6 +49,16 @@ export interface Business {
   featured: boolean
   status: string
   created_at: string
+  description_es?: string
+  description_en?: string
+  address_es?: string
+  address_en?: string
+  latitude?: number | null
+  longitude?: number | null
+  rating?: number | null
+  reviews_count?: number | null
+  source?: string
+  schema_type?: string
 }
 
 export interface Offer {

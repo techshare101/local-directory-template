@@ -4,6 +4,7 @@ import "./globals.css";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { SEO } from "@/lib/site.config";
+import { LocaleProvider } from "@/lib/locale-context";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,11 +32,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <Header />
-        <main className="w-full flex-1 px-4 sm:px-6 lg:px-10 py-6">
-          {children}
-        </main>
-        <Footer />
+        <LocaleProvider>
+          <Header />
+          <main className="w-full flex-1 px-4 sm:px-6 lg:px-10 py-6">
+            {children}
+          </main>
+          <Footer />
+        </LocaleProvider>
       </body>
     </html>
   );
