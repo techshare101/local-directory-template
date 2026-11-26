@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic'
 
 export default async function Home() {
   const locale = await getLocale()
-  const { categories, businesses } = await getHome()
+  const { categories, businesses, posts } = await getHome()
 
   const counts: Record<string, number> = {}
   for (const b of businesses) {
@@ -108,6 +108,50 @@ export default async function Home() {
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
             {fresh.map((b) => (
               <BusinessTile key={b.id} b={b} locale={locale} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Local spotlight — light articles with pictures */}
+      {posts.length > 0 && (
+        <section>
+          <div className="mb-4 flex items-end justify-between">
+            <div>
+              <h2 className="text-xl font-bold text-slate-900">{SITE.spotlightTitle}</h2>
+              <p className="text-sm text-slate-500">{SITE.spotlightSubtitle}</p>
+            </div>
+            <Link href="/blog" className="text-sm font-semibold text-emerald-700 hover:underline">
+              {SITE.spotlightAllLabel}
+            </Link>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {posts.slice(0, 3).map((p) => (
+              <Link
+                key={p.id}
+                href={`/blog/${p.id}`}
+                className="group overflow-hidden rounded-xl border border-slate-200 bg-white transition hover:border-emerald-500 hover:shadow-sm"
+              >
+                {p.cover ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={p.cover} alt={p.title} className="h-44 w-full object-cover transition group-hover:opacity-90" />
+                ) : (
+                  <div className="h-44 w-full bg-emerald-950/90" />
+                )}
+                <div className="p-4">
+                  <div className="text-xs text-slate-500">
+                    {new Date(p.published_at).toLocaleDateString(locale === 'es' ? 'es-DO' : 'en-US', {
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric',
+                    })}
+                    {' · '}
+                    <span className="font-medium text-emerald-700">{SITE.city}</span>
+                  </div>
+                  <h3 className="mt-1.5 font-semibold text-slate-900 group-hover:text-emerald-800">{p.title}</h3>
+                  <p className="mt-1 line-clamp-2 text-sm text-slate-500">{p.excerpt}</p>
+                </div>
+              </Link>
             ))}
           </div>
         </section>
