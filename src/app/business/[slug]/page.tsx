@@ -1,8 +1,9 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { BadgeCheck, MapPin, Phone, Mail, Globe, Clock, Tag, CalendarDays, FileText } from 'lucide-react'
+import { BadgeCheck, MapPin, Phone, Mail, Globe, Tag, CalendarDays, FileText, Navigation } from 'lucide-react'
 import { getBusinessBySlug } from '@/lib/data'
 import { EnquiryForm } from '@/components/enquiry-form'
+import { SingleMap } from '@/components/single-map-dynamic'
 import { getLocale, pick } from '@/lib/server-locale'
 
 export const dynamic = 'force-dynamic'
@@ -47,7 +48,18 @@ export default async function BusinessPage({ params }: { params: Promise<{ slug:
           // eslint-disable-next-line @next/next/no-img-element
           <img src={b.image_hero} alt={b.name} className="h-64 w-full object-cover opacity-70" />
         ) : (
-          <div className="h-64 w-full bg-slate-800" />
+          <div className="relative flex h-64 w-full items-center justify-center overflow-hidden bg-gradient-to-br from-emerald-900 via-emerald-800 to-teal-900">
+            <div
+              className="absolute inset-0 opacity-[0.08]"
+              style={{
+                backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)',
+                backgroundSize: '24px 24px',
+              }}
+            />
+            <span className="flex h-24 w-24 items-center justify-center rounded-3xl bg-white/10 text-5xl font-bold text-white backdrop-blur-sm">
+              {b.name.charAt(0).toUpperCase()}
+            </span>
+          </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 to-transparent" />
         <div className="absolute bottom-0 w-full p-6">
@@ -163,6 +175,42 @@ export default async function BusinessPage({ params }: { params: Promise<{ slug:
               </div>
             </section>
           )}
+          {/* Location map */}
+          <section>
+            <h2 className="text-xl font-bold text-slate-900">Find {b.name}</h2>
+            <p className="text-sm text-slate-500">{addr || (locale === 'es' ? 'Ubicación en el mapa' : 'Location on the map')}</p>
+            {typeof b.latitude === 'number' && typeof b.longitude === 'number' ? (
+              <>
+                <div className="mt-4 overflow-hidden rounded-2xl border border-slate-200 shadow-sm">
+                  <SingleMap lat={b.latitude} lng={b.longitude} name={b.name} />
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <a
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${b.latitude},${b.longitude}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700"
+                  >
+                    <Navigation size={15} /> {locale === 'es' ? 'Cómo llegar' : 'Get directions'}
+                  </a>
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${b.latitude},${b.longitude}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-emerald-500 hover:text-emerald-700"
+                  >
+                    <MapPin size={15} /> {locale === 'es' ? 'Abrir en Google Maps' : 'Open in Google Maps'}
+                  </a>
+                </div>
+              </>
+            ) : (
+              <p className="mt-3 text-sm text-slate-500">
+                {locale === 'es'
+                  ? 'La ubicación aún no está fijada en el mapa. Esta ficha se actualizará al reclamarse.'
+                  : 'This listing is not pinned on the map yet. It updates when the owner claims the profile.'}
+              </p>
+            )}
+          </section>
         </div>
 
         {/* Side column */}
@@ -200,6 +248,27 @@ export default async function BusinessPage({ params }: { params: Promise<{ slug:
               )}
             </ul>
           </InfoCard>
+
+          {/* Ad slot — monetizable inventory */}
+          <section className="rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 p-5 text-center">
+            <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+              {locale === 'es' ? 'Publicidad' : 'Advertisement'}
+            </div>
+            <p className="mt-2 text-sm font-semibold text-slate-700">
+              {locale === 'es' ? 'Tu anuncio aquí' : 'Your ad here'}
+            </p>
+            <p className="mt-1 text-xs text-slate-500">
+              {locale === 'es'
+                ? 'Llega a clientes locales que buscan negocios en Villa Isabela.'
+                : 'Reach local customers browsing Villa Isabela listings.'}
+            </p>
+            <Link
+              href="/pricing"
+              className="mt-3 inline-block text-xs font-semibold text-emerald-700 hover:underline"
+            >
+              {locale === 'es' ? 'Anunciar en este espacio →' : 'Advertise in this spot →'}
+            </Link>
+          </section>
 
           <InfoCard title="Send an enquiry">
             <p className="mb-3 text-sm text-slate-600">Contact {b.name} directly for quotes or questions.</p>
