@@ -89,6 +89,39 @@ export async function getCategoryAndLocations(categoryId: string) {
   return { category: category ?? null, locations: locations ?? [], businesses: businesses ?? [] }
 }
 
+/** Businesses that carry real coordinates — the map dataset (~90% coverage). */
+export async function getMapBusinesses() {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from(TABLES.businesses)
+    .select(`*, ${TABLES.categories}(id, name, schema_type)`)
+    .eq('status', 'listed')
+    .not('latitude', 'is', null)
+    .not('longitude', 'is', null)
+    .order('name', { ascending: true })
+  return (data ?? []) as unknown as (Business & {
+    categories: { id: string; name: string; schema_type: string } | null
+  })[]
+}
+
+/** A lightweight, listing-card-safe projection for map sidebar + markers. */
+export function toMapPoint(
+  b: Business & { categories?: { id: string; name: string } | null },
+  locale: 'en' | 'es',
+) {
+  return {
+    id: b.id,
+    slug: b.slug,
+    lat: Number(b.latitude),
+    lng: Number(b.longitude),
+    name: b.name,
+    category: b.categories?.name ?? '',
+    categoryId: b.categories?.id ?? b.category_id ?? '',
+    address: locale === 'es' ? b.address_es || b.address : b.address_en || b.address,
+    claimed: b.claimed,
+  }
+}
+
 // ============================================================================
 // CLAIMING (manual review, ported from isla Phase 2 — Option A)
 // ============================================================================

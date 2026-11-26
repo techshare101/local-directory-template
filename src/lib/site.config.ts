@@ -52,6 +52,7 @@ export const SITE = {
   ctaAddBusiness: 'Add your business',
   navCategories: 'Categories',
   navSearch: 'Search',
+  navMap: 'Map',
   navSpotlight: 'Spotlight',
   navEvents: 'Events',
   footerTagline: 'Supporting local business on the Dominican north coast.',

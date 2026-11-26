@@ -19,6 +19,7 @@ export function Header() {
         <nav className="flex items-center gap-1 text-sm font-medium text-slate-600 sm:gap-2">
           <Link href="/categories" className="rounded-lg px-3 py-2 hover:bg-slate-100 hover:text-slate-900">{SITE.navCategories}</Link>
           <Link href="/search" className="rounded-lg px-3 py-2 hover:bg-slate-100 hover:text-slate-900">{SITE.navSearch}</Link>
+          <Link href="/map" className="rounded-lg px-3 py-2 hover:bg-slate-100 hover:text-slate-900">{SITE.navMap}</Link>
           <Link href="/blog" className="hidden rounded-lg px-3 py-2 hover:bg-slate-100 hover:text-slate-900 sm:inline">{SITE.navSpotlight}</Link>
           <Link href="/events" className="hidden rounded-lg px-3 py-2 hover:bg-slate-100 hover:text-slate-900 sm:inline">{SITE.navEvents}</Link>
           <Link
