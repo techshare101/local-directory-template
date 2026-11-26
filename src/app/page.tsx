@@ -9,6 +9,41 @@ import type { Business } from '@/lib/database.types'
 
 export const dynamic = 'force-dynamic'
 
+// Full-bleed band wrapper: breaks the page into distinct visual zones.
+const BAND = '-mx-4 sm:-mx-6 lg:-mx-10 px-4 sm:px-6 lg:px-10 py-14'
+
+function SectionHead({
+  eyebrow,
+  title,
+  subtitle,
+  allHref,
+  allLabel,
+}: {
+  eyebrow: string
+  title: string
+  subtitle: string
+  allHref: string
+  allLabel: string
+}) {
+  return (
+    <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+      <div>
+        <span className="inline-block rounded-full bg-emerald-100 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-emerald-700">
+          {eyebrow}
+        </span>
+        <h2 className="mt-2 text-2xl font-bold text-slate-900 sm:text-3xl">{title}</h2>
+        <p className="mt-1 text-sm text-slate-500">{subtitle}</p>
+      </div>
+      <Link
+        href={allHref}
+        className="rounded-full border border-emerald-200 bg-white px-4 py-2 text-sm font-semibold text-emerald-700 transition hover:border-emerald-500 hover:bg-emerald-50"
+      >
+        {allLabel} →
+      </Link>
+    </div>
+  )
+}
+
 export default async function Home() {
   const locale = await getLocale()
   const { categories, businesses, posts, events } = await getHome()
@@ -27,8 +62,8 @@ export default async function Home() {
     .sort((a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime())
 
   return (
-    <div className="space-y-12">
-      {/* Hero */}
+    <div>
+      {/* ============ Hero band ============ */}
       <section className="relative -mx-4 overflow-hidden bg-emerald-950 sm:-mx-6 lg:-mx-10">
         <div
           className="pointer-events-none absolute inset-0 opacity-40"
@@ -54,7 +89,7 @@ export default async function Home() {
                 className="w-full rounded-xl border-0 bg-white py-3 pl-10 pr-4 text-slate-900 placeholder:text-slate-400"
               />
             </div>
-            <button className="rounded-xl bg-emerald-500 px-5 py-3 text-sm font-semibold text-white hover:bg-emerald-400">
+            <button className="rounded-xl bg-emerald-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-400">
               Search
             </button>
           </form>
@@ -67,25 +102,23 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Category grid */}
-      <section>
-        <div className="mb-4 flex items-end justify-between">
-          <div>
-            <h2 className="text-xl font-bold text-slate-900">{SITE.browseByCategoryTitle}</h2>
-            <p className="text-sm text-slate-500">{SITE.browseByCategorySubtitle}</p>
-          </div>
-          <Link href="/categories" className="text-sm font-semibold text-emerald-700 hover:underline">
-            {SITE.browseAllLabel}
-          </Link>
-        </div>
+      {/* ============ Categories (white zone) ============ */}
+      <section className={BAND}>
+        <SectionHead
+          eyebrow="Browse"
+          title={SITE.browseByCategoryTitle}
+          subtitle={SITE.browseByCategorySubtitle}
+          allHref="/categories"
+          allLabel={SITE.browseAllLabel}
+        />
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
           {orderedCategories.map((c) => (
             <Link
               key={c.id}
               href={`/category/${c.id}`}
-              className="group flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 transition hover:border-emerald-500 hover:shadow-sm"
+              className="group flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 transition hover:-translate-y-0.5 hover:border-emerald-500 hover:shadow-lg hover:shadow-emerald-900/5"
             >
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-700 group-hover:bg-emerald-50 group-hover:text-emerald-600">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-700 transition group-hover:bg-emerald-50 group-hover:text-emerald-600">
                 <CategoryIcon id={c.icon || 'map-pin'} className="h-5 w-5" />
               </span>
               <span className="flex flex-col">
@@ -97,18 +130,16 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Fresh listings */}
+      {/* ============ Fresh listings (tinted zone) ============ */}
       {fresh.length > 0 && (
-        <section>
-          <div className="mb-4 flex items-end justify-between">
-            <div>
-              <h2 className="text-xl font-bold text-slate-900">{SITE.freshTitle}</h2>
-              <p className="text-sm text-slate-500">{SITE.freshSubtitle}</p>
-            </div>
-            <Link href="/search" className="text-sm font-semibold text-emerald-700 hover:underline">
-              {SITE.freshAllLabel}
-            </Link>
-          </div>
+        <section className={`${BAND} bg-emerald-50/60`}>
+          <SectionHead
+            eyebrow="Just added"
+            title={SITE.freshTitle}
+            subtitle={SITE.freshSubtitle}
+            allHref="/search"
+            allLabel={SITE.freshAllLabel}
+          />
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
             {fresh.map((b) => (
               <BusinessTile key={b.id} b={b} locale={locale} />
@@ -117,32 +148,30 @@ export default async function Home() {
         </section>
       )}
 
-      {/* Local spotlight — light articles with pictures */}
+      {/* ============ Local spotlight (white zone) ============ */}
       {posts.length > 0 && (
-        <section>
-          <div className="mb-4 flex items-end justify-between">
-            <div>
-              <h2 className="text-xl font-bold text-slate-900">{SITE.spotlightTitle}</h2>
-              <p className="text-sm text-slate-500">{SITE.spotlightSubtitle}</p>
-            </div>
-            <Link href="/blog" className="text-sm font-semibold text-emerald-700 hover:underline">
-              {SITE.spotlightAllLabel}
-            </Link>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <section className={BAND}>
+          <SectionHead
+            eyebrow="Stories"
+            title={SITE.spotlightTitle}
+            subtitle={SITE.spotlightSubtitle}
+            allHref="/blog"
+            allLabel={SITE.spotlightAllLabel}
+          />
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {posts.slice(0, 3).map((p) => (
               <Link
                 key={p.id}
                 href={`/blog/${p.id}`}
-                className="group overflow-hidden rounded-xl border border-slate-200 bg-white transition hover:border-emerald-500 hover:shadow-sm"
+                className="group overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:-translate-y-1 hover:border-emerald-500 hover:shadow-xl hover:shadow-emerald-900/10"
               >
                 {p.cover ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={p.cover} alt={p.title} className="h-44 w-full object-cover transition group-hover:opacity-90" />
+                  <img src={p.cover} alt={p.title} className="h-48 w-full object-cover transition duration-300 group-hover:scale-[1.03]" />
                 ) : (
-                  <div className="h-44 w-full bg-emerald-950/90" />
+                  <div className="h-48 w-full bg-emerald-950/90" />
                 )}
-                <div className="p-4">
+                <div className="p-5">
                   <div className="text-xs text-slate-500">
                     {new Date(p.published_at).toLocaleDateString(locale === 'es' ? 'es-DO' : 'en-US', {
                       day: 'numeric',
@@ -152,7 +181,7 @@ export default async function Home() {
                     {' · '}
                     <span className="font-medium text-emerald-700">{SITE.city}</span>
                   </div>
-                  <h3 className="mt-1.5 font-semibold text-slate-900 group-hover:text-emerald-800">{p.title}</h3>
+                  <h3 className="mt-2 text-lg font-semibold leading-snug text-slate-900 group-hover:text-emerald-800">{p.title}</h3>
                   <p className="mt-1 line-clamp-2 text-sm text-slate-500">{p.excerpt}</p>
                 </div>
               </Link>
@@ -160,40 +189,39 @@ export default async function Home() {
           </div>
         </section>
       )}
-      {/* Upcoming events — with pictures */}
+
+      {/* ============ Upcoming events (tinted zone) ============ */}
       {upcomingEvents.length > 0 && (
-        <section>
-          <div className="mb-4 flex items-end justify-between">
-            <div>
-              <h2 className="text-xl font-bold text-slate-900">{SITE.eventsTitle}</h2>
-              <p className="text-sm text-slate-500">{SITE.eventsSubtitle}</p>
-            </div>
-            <Link href="/events" className="text-sm font-semibold text-emerald-700 hover:underline">
-              {SITE.eventsAllLabel}
-            </Link>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <section className={`${BAND} bg-emerald-50/60`}>
+          <SectionHead
+            eyebrow="What's on"
+            title={SITE.eventsTitle}
+            subtitle={SITE.eventsSubtitle}
+            allHref="/events"
+            allLabel={SITE.eventsAllLabel}
+          />
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {upcomingEvents.slice(0, 6).map((ev) => (
               <Link
                 key={ev.id}
                 href={`/events/${ev.id}`}
-                className="group overflow-hidden rounded-xl border border-slate-200 bg-white transition hover:border-emerald-500 hover:shadow-sm"
+                className="group overflow-hidden rounded-2xl border border-emerald-100 bg-white transition hover:-translate-y-1 hover:border-emerald-500 hover:shadow-xl hover:shadow-emerald-900/10"
               >
                 {ev.cover ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={ev.cover} alt={ev.title} className="h-40 w-full object-cover transition group-hover:opacity-90" />
+                  <img src={ev.cover} alt={ev.title} className="h-40 w-full object-cover transition duration-300 group-hover:scale-[1.03]" />
                 ) : (
                   <div className="h-40 w-full bg-emerald-950/90" />
                 )}
-                <div className="p-4">
-                  <div className="text-xs font-semibold text-emerald-700">
+                <div className="p-5">
+                  <div className="text-xs font-bold uppercase tracking-wide text-emerald-700">
                     {new Date(ev.starts_at).toLocaleDateString(locale === 'es' ? 'es-DO' : 'en-US', {
                       weekday: 'short',
                       month: 'short',
                       day: 'numeric',
                     })}
                   </div>
-                  <h3 className="mt-1 font-semibold text-slate-900 group-hover:text-emerald-800">{ev.title}</h3>
+                  <h3 className="mt-2 text-lg font-semibold leading-snug text-slate-900 group-hover:text-emerald-800">{ev.title}</h3>
                   <p className="mt-1 line-clamp-2 text-sm text-slate-500">{ev.description}</p>
                   {ev.venue && <div className="mt-2 text-xs text-slate-500">{ev.venue}</div>}
                 </div>
@@ -202,6 +230,29 @@ export default async function Home() {
           </div>
         </section>
       )}
+
+      {/* ============ Owner CTA band (dark bookend) ============ */}
+      <section className="-mx-4 bg-emerald-950 px-4 py-14 text-center text-white sm:-mx-6 sm:px-6 lg:-mx-10 lg:px-10">
+        <h2 className="text-2xl font-bold sm:text-3xl">Are you a local business owner?</h2>
+        <p className="mx-auto mt-2 max-w-xl text-emerald-100">
+          Claim your free profile to manage your listing, keep your details up to date, and post
+          events — free, no credit card.
+        </p>
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+          <Link
+            href="/claim"
+            className="rounded-xl bg-emerald-500 px-6 py-3 text-sm font-semibold text-white transition hover:bg-emerald-400"
+          >
+            {SITE.ctaAddBusiness}
+          </Link>
+          <Link
+            href="/search"
+            className="rounded-xl border border-emerald-700 px-6 py-3 text-sm font-semibold text-emerald-100 transition hover:border-emerald-500 hover:text-white"
+          >
+            Search the directory
+          </Link>
+        </div>
+      </section>
     </div>
   )
 }
@@ -220,11 +271,17 @@ function BusinessTile({ b, locale }: { b: Business; locale: 'en' | 'es' }) {
   return (
     <Link
       href={`/business/${b.slug}`}
-      className="group overflow-hidden rounded-xl border border-slate-200 bg-white transition hover:border-emerald-500 hover:shadow-sm"
+      className="group overflow-hidden rounded-2xl border border-emerald-100 bg-white transition hover:-translate-y-1 hover:border-emerald-500 hover:shadow-xl hover:shadow-emerald-900/10"
     >
-      {b.image_hero && (
+      {b.image_hero ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={b.image_hero} alt={b.name} className="h-36 w-full object-cover" />
+        <img src={b.image_hero} alt={b.name} className="h-36 w-full object-cover transition duration-300 group-hover:scale-[1.03]" />
+      ) : (
+        <div className="flex h-36 w-full items-center justify-center bg-gradient-to-br from-emerald-100 to-emerald-50">
+          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-lg font-bold text-emerald-700 shadow-sm">
+            {b.name.charAt(0).toUpperCase()}
+          </span>
+        </div>
       )}
       <div className="p-3">
         <div className="flex items-center justify-between">
@@ -236,4 +293,3 @@ function BusinessTile({ b, locale }: { b: Business; locale: 'en' | 'es' }) {
     </Link>
   )
 }
-
