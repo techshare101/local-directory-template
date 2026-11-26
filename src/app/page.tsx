@@ -1,69 +1,145 @@
-import Image from "next/image";
+import Link from 'next/link'
+import { Search, Store } from 'lucide-react'
+import { getHome } from '@/lib/data'
+import { CATEGORY_ORDER } from '@/lib/directory'
+import type { Business } from '@/lib/database.types'
 
-export default function Home() {
+export const dynamic = 'force-dynamic'
+
+export default async function Home() {
+  const { categories, businesses } = await getHome()
+
+  const counts: Record<string, number> = {}
+  for (const b of businesses) {
+    if (b.category_id) counts[b.category_id] = (counts[b.category_id] || 0) + 1
+  }
+  const orderedCategories = [...categories].sort(
+    (a, b) => (CATEGORY_ORDER.indexOf(a.id) - CATEGORY_ORDER.indexOf(b.id)) || (a.sort_order - b.sort_order)
+  )
+  const fresh = businesses.slice(0, 8)
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <div className="space-y-12">
+      {/* Hero */}
+      <section className="relative overflow-hidden rounded-3xl bg-emerald-950">
+        <div
+          className="pointer-events-none absolute inset-0 opacity-40"
+          style={{
+            backgroundImage:
+              'url(https://images.unsplash.com/photo-1519451241324-20b4ea2c4220?w=1600&q=80)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
+        <div className="relative px-6 py-16 text-white sm:px-10 sm:py-24">
+          <h1 className="max-w-xl text-3xl font-bold leading-tight sm:text-5xl">
+            Discover local businesses in Villa Isabela
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="mt-3 max-w-lg text-emerald-100">
+            Find the best local services, restaurants and experiences on the Dominican north coast.
           </p>
+          <form action="/search" className="mt-6 flex max-w-xl gap-2">
+            <div className="relative flex-1">
+              <Search size={18} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input
+                name="q"
+                placeholder="Search for a business…"
+                className="w-full rounded-xl border-0 bg-white py-3 pl-10 pr-4 text-slate-900 placeholder:text-slate-400"
+              />
+            </div>
+            <button className="rounded-xl bg-emerald-500 px-5 py-3 text-sm font-semibold text-white hover:bg-emerald-400">
+              Search
+            </button>
+          </form>
+          <div className="mt-10 grid grid-cols-2 gap-6 sm:grid-cols-4">
+            <Stat value={`${businesses.length}+`} label="Local businesses" />
+            <Stat value="4" label="Suburbs covered" />
+            <Stat value={`${categories.length}`} label="Categories" />
+            <Stat value="0+" label="Verified owners" />
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+
+      {/* Category grid */}
+      <section>
+        <div className="mb-4 flex items-end justify-between">
+          <div>
+            <h2 className="text-xl font-bold text-slate-900">Browse by category</h2>
+            <p className="text-sm text-slate-500">Find the services you need.</p>
+          </div>
+          <Link href="/categories" className="text-sm font-semibold text-emerald-700 hover:underline">
+            Browse all categories
+          </Link>
         </div>
-      </main>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+          {orderedCategories.map((c) => (
+            <Link
+              key={c.id}
+              href={`/category/${c.id}`}
+              className="group flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 transition hover:border-emerald-500 hover:shadow-sm"
+            >
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-700 group-hover:bg-emerald-50 group-hover:text-emerald-600">
+                <Store size={18} />
+              </span>
+              <span className="flex flex-col">
+                <span className="text-sm font-semibold text-slate-900">{c.name}</span>
+                <span className="text-xs text-slate-500">{counts[c.id] || 0} listings</span>
+              </span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* Fresh listings */}
+      {fresh.length > 0 && (
+        <section>
+          <div className="mb-4 flex items-end justify-between">
+            <div>
+              <h2 className="text-xl font-bold text-slate-900">Fresh in Villa Isabela</h2>
+              <p className="text-sm text-slate-500">The newest businesses to join the directory.</p>
+            </div>
+            <Link href="/search" className="text-sm font-semibold text-emerald-700 hover:underline">
+              View all
+            </Link>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {fresh.map((b) => (
+              <BusinessTile key={b.id} b={b} />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
-  );
+  )
 }
+
+function Stat({ value, label }: { value: string; label: string }) {
+  return (
+    <div>
+      <div className="text-2xl font-bold text-white">{value}</div>
+      <div className="text-sm text-emerald-200">{label}</div>
+    </div>
+  )
+}
+
+function BusinessTile({ b }: { b: Business }) {
+  return (
+    <Link
+      href={`/business/${b.slug}`}
+      className="group overflow-hidden rounded-xl border border-slate-200 bg-white transition hover:border-emerald-500 hover:shadow-sm"
+    >
+      {b.image_hero && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={b.image_hero} alt={b.name} className="h-36 w-full object-cover" />
+      )}
+      <div className="p-3">
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-semibold text-slate-900">{b.name}</h3>
+          {b.claimed && <span className="text-[11px] font-semibold text-emerald-700">Claimed</span>}
+        </div>
+        <p className="mt-1 line-clamp-2 text-xs text-slate-500">{b.description}</p>
+      </div>
+    </Link>
+  )
+}
+
