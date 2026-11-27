@@ -113,7 +113,9 @@ export default async function Home() {
           allLabel={SITE.browseAllLabel}
         />
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
-          {orderedCategories.map((c) => (
+          {orderedCategories
+            .filter((c) => (counts[c.id] || 0) > 0)
+            .map((c) => (
             <Link
               key={c.id}
               href={`/category/${c.id}`}
@@ -348,22 +350,23 @@ function BusinessTile({ b, locale }: { b: Business; locale: 'en' | 'es' }) {
       href={`/business/${b.slug}`}
       className="group overflow-hidden rounded-2xl border border-emerald-100 bg-white transition hover:-translate-y-1 hover:border-emerald-500 hover:shadow-xl hover:shadow-emerald-900/10"
     >
-      {b.image_hero ? (
+      {b.image_hero && (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={b.image_hero} alt={b.name} className="h-36 w-full object-cover transition duration-300 group-hover:scale-[1.03]" />
-      ) : (
-        <div className="flex h-36 w-full items-center justify-center bg-gradient-to-br from-emerald-100 to-emerald-50">
-          <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-lg font-bold text-emerald-700 shadow-sm">
-            {b.name.charAt(0).toUpperCase()}
-          </span>
-        </div>
       )}
       <div className="p-3">
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-slate-900">{b.name}</h3>
-          {b.claimed && <span className="text-[11px] font-semibold text-emerald-700">Claimed</span>}
+        <div className="flex items-center gap-2.5">
+          {!b.image_hero && (
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-sm font-bold text-emerald-700">
+              {b.name.charAt(0).toUpperCase()}
+            </span>
+          )}
+          <div className="flex min-w-0 flex-1 items-center justify-between gap-2">
+            <h3 className="truncate text-sm font-semibold text-slate-900">{b.name}</h3>
+            {b.claimed && <span className="shrink-0 text-[11px] font-semibold text-emerald-700">Claimed</span>}
+          </div>
         </div>
-        <p className="mt-1 line-clamp-2 text-xs text-slate-500">{ddesc}</p>
+        <p className="mt-1.5 line-clamp-2 text-xs text-slate-500">{ddesc}</p>
       </div>
     </Link>
   )
