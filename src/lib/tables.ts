@@ -19,4 +19,6 @@ export const TABLES = {
   submissions: tb('submissions'),
   claims: tb('claims'),
   featuredRequests: tb('featured_requests'),
+  adminAttempts: tb('admin_attempts'),
+  adminLog: tb('admin_log'),
 } as const

@@ -5,6 +5,7 @@ import { isAdmin } from '@/lib/admin-auth'
 import { listClaims, reviewClaim } from '@/lib/data'
 import { issueOwnerToken } from '@/lib/owner'
 import { sendOwnerLink } from '@/lib/whatsapp'
+import { clientIp, logAdminAction } from '@/lib/admin-security'
 import { SITE } from '@/lib/site.config'
 
 export async function POST(_req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -32,6 +33,14 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
   }
 
   await reviewClaim(id, action)
+
+  await logAdminAction({
+    action: `claim_${action}`,
+    entityType: 'claim',
+    entityId: id,
+    detail: { business_id: claim.business_id ?? null },
+    ip: clientIp(_req),
+  })
 
   // On approve: resolve the business DIRECTLY by business_id (service role,
   // RLS bypass) and flip to claimed + copy owner-supplied contact info. Gate on
