@@ -95,11 +95,10 @@ export default async function Home() {
               Search
             </button>
           </form>
-          <div className="mt-10 grid grid-cols-2 gap-6 sm:grid-cols-4">
+          <div className="mt-10 grid grid-cols-3 gap-6">
             <Stat value={`${businesses.length}+`} label="Local businesses" />
             <Stat value={SITE.statSuburbsValue} label={SITE.statSuburbsLabel} />
             <Stat value={`${categories.length}`} label="Categories" />
-            <Stat value={SITE.statVerifiedValue} label={SITE.statVerifiedLabel} />
           </div>
         </div>
       </section>
