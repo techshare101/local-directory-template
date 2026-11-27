@@ -1,7 +1,7 @@
 /* Minimal service worker: installability + static caching.
    No offline data sync — listings are always fetched fresh. */
 
-const CACHE = 'isabela-static-v1'
+const CACHE = 'isabela-static-v2'
 
 self.addEventListener('install', () => {
   self.skipWaiting()
@@ -38,8 +38,27 @@ self.addEventListener('fetch', (event) => {
     return
   }
 
-  // Hashed build assets + icons: cache first (filenames change on every deploy).
-  if (url.pathname.startsWith('/_next/static/') || url.pathname.startsWith('/icons/')) {
+  // Icons: network first so a changed icon is never stuck in cache.
+  if (url.pathname.startsWith('/icons/')) {
+    event.respondWith(
+      (async () => {
+        const cache = await caches.open(CACHE)
+        try {
+          const res = await fetch(request)
+          if (res.ok) cache.put(request, res.clone())
+          return res
+        } catch {
+          const hit = await cache.match(request)
+          if (hit) return hit
+          throw new Error('icon unavailable offline')
+        }
+      })(),
+    )
+    return
+  }
+
+  // Hashed build assets: cache first (filenames change on every deploy).
+  if (url.pathname.startsWith('/_next/static/')) {
     event.respondWith(
       (async () => {
         const cache = await caches.open(CACHE)

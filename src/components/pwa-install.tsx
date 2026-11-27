@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { Download, X } from 'lucide-react'
 
 type BeforeInstallPromptEvent = Event & {
@@ -29,6 +30,8 @@ function alreadyInstalled() {
 }
 
 export function PwaInstall() {
+  const pathname = usePathname()
+  const onOwner = pathname?.startsWith('/owner') ?? false
   const [mounted, setMounted] = useState(false)
   const [installEvent, setInstallEvent] = useState<BeforeInstallPromptEvent | null>(null)
   const [showIosHint, setShowIosHint] = useState(false)
@@ -36,6 +39,8 @@ export function PwaInstall() {
 
   useEffect(() => {
     setMounted(true)
+    // The owner dashboard has its own inline install card.
+    if (onOwner) return
     if (alreadyInstalled()) return
 
     // Register the service worker (required for installability on Android).
@@ -66,7 +71,7 @@ export function PwaInstall() {
       window.removeEventListener('beforeinstallprompt', onPrompt)
       if (timer) window.clearTimeout(timer)
     }
-  }, [])
+  }, [onOwner])
 
   function close() {
     try {

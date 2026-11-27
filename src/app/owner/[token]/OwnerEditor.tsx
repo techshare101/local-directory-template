@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { BadgeCheck, Camera, ExternalLink, ImagePlus, MapPin, Save, Trash2, Upload, Loader2 } from 'lucide-react'
 import type { Business } from '@/lib/database.types'
 import { DAYS } from '@/lib/hours'
+import { OwnerInstallCard } from './OwnerInstallCard'
 
 type HoursState = Record<string, { open: string; close: string; closed: boolean }>
 
@@ -191,6 +192,8 @@ export function OwnerEditor({ token, business }: { token: string; business: Busi
         </div>
       </div>
 
+      <OwnerInstallCard />
+
       {msg && (
         <div
           className={`rounded-xl border px-4 py-3 text-sm ${
@@ -323,23 +326,23 @@ export function OwnerEditor({ token, business }: { token: string; business: Busi
               {DAYS.map((d) => {
                 const row = hours[d.key]
                 return (
-                  <div key={d.key} className="grid grid-cols-[90px_1fr_1fr_auto] items-center gap-2 sm:grid-cols-[120px_1fr_1fr_auto]">
-                    <span className="text-sm font-medium text-slate-700">{d.en}</span>
+                  <div key={d.key} className="grid grid-cols-2 gap-2 rounded-xl border border-slate-100 p-2 sm:grid-cols-[120px_1fr_1fr_auto] sm:items-center sm:border-0 sm:p-0">
+                    <span className="col-span-2 text-xs font-semibold uppercase tracking-wide text-slate-500 sm:col-span-1 sm:text-sm sm:font-medium sm:normal-case sm:tracking-normal sm:text-slate-700">{d.en}</span>
                     <input
                       type="time"
                       value={row.open}
                       disabled={row.closed}
                       onChange={(e) => setHours((h) => ({ ...h, [d.key]: { ...h[d.key], open: e.target.value } }))}
-                      className={`${input} disabled:bg-slate-100 disabled:text-slate-400`}
+                      className={`${input} min-w-0 disabled:bg-slate-100 disabled:text-slate-400`}
                     />
                     <input
                       type="time"
                       value={row.close}
                       disabled={row.closed}
                       onChange={(e) => setHours((h) => ({ ...h, [d.key]: { ...h[d.key], close: e.target.value } }))}
-                      className={`${input} disabled:bg-slate-100 disabled:text-slate-400`}
+                      className={`${input} min-w-0 disabled:bg-slate-100 disabled:text-slate-400`}
                     />
-                    <label className="flex items-center gap-1.5 text-xs text-slate-600">
+                    <label className="col-span-2 flex items-center gap-1.5 text-xs text-slate-600 sm:col-span-1">
                       <input
                         type="checkbox"
                         checked={row.closed}
