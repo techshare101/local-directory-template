@@ -21,12 +21,21 @@ export default async function AdminClaimsPage() {
             {pending.length} pending · approving sets the listing to claimed.
           </p>
         </div>
-        <a href="/" className="text-sm font-semibold text-emerald-700 hover:underline">← {SITE.shortName}</a>
+        <div className="flex items-center gap-4">
+          <a href="/admin/featured" className="text-sm font-semibold text-amber-700 hover:underline">
+            Featured requests
+          </a>
+          <a href="/" className="text-sm font-semibold text-emerald-700 hover:underline">← {SITE.shortName}</a>
+        </div>
       </div>
 
       {pending.length === 0 && (
-        <div className="rounded-xl border border-dashed border-slate-300 p-10 text-center text-sm text-slate-500">
-          No pending claims.
+        <div className="rounded-xl border border-dashed border-slate-300 p-10 text-center">
+          <p className="text-sm font-semibold text-slate-600">No pending claims.</p>
+          <p className="mx-auto mt-1 max-w-md text-xs text-slate-500">
+            Claims appear here when an owner opens their listing and clicks “Claim this business”.
+            To test the flow yourself, open any listing and submit the claim form.
+          </p>
         </div>
       )}
 
