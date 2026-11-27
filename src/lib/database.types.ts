@@ -47,6 +47,9 @@ export interface Business {
   image_logo: string
   claimed: boolean
   featured: boolean
+  featured_until?: string | null
+  featured_rank?: number
+  featured_note?: string
   status: string
   created_at: string
   description_es?: string

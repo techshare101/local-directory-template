@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { BadgeCheck } from 'lucide-react'
 import type { Business } from '@/lib/database.types'
 import type { Locale } from '@/lib/locale'
+import { isFeatured } from '@/lib/featured'
 
 export function BusinessCard({ b, locale = 'en' }: { b: Business; locale?: Locale }) {
   const desc = locale === 'es' ? b.description_es || b.description : b.description
@@ -19,6 +20,11 @@ export function BusinessCard({ b, locale = 'en' }: { b: Business; locale?: Local
         />
       )}
       <div className="p-4">
+        {isFeatured(b) && (
+          <span className="mb-2 inline-block rounded-full bg-amber-400 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-amber-950">
+            Sponsored
+          </span>
+        )}
         <div className="flex items-center justify-between gap-2">
           <h3 className="text-sm font-semibold text-slate-900 group-hover:text-emerald-700">
             {b.name}

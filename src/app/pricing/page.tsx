@@ -17,7 +17,7 @@ export default function PricingPage() {
       highlighted: true,
       features: ['Everything in Free', 'Pin to top of category', 'Featured badge & homepage spotlight', 'Offers & promotions show on your profile', 'Monthly stats'],
       cta: 'Go featured',
-      href: '/add-business',
+      href: '/feature',
     },
   ]
   return (
@@ -56,7 +56,7 @@ export default function PricingPage() {
         ))}
       </div>
       <p className="text-center text-xs text-slate-400">
-        MVP preview — recurring billing via Stripe is the next phase and not yet active. Deferring monetization this build.
+        Featured placement is activated by hand within 24 hours of payment, and expires automatically — nothing renews silently.
       </p>
     </div>
   )

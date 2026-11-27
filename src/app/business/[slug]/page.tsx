@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { BadgeCheck, MapPin, Phone, Mail, Globe, Tag, CalendarDays, FileText, Navigation, Clock } from 'lucide-react'
+import { BadgeCheck, MapPin, Phone, Mail, Globe, Tag, CalendarDays, FileText, Navigation, Clock, Star } from 'lucide-react'
+import { isFeatured } from '@/lib/featured'
 import { getBusinessBySlug } from '@/lib/data'
 import { EnquiryForm } from '@/components/enquiry-form'
 import { SingleMap } from '@/components/single-map-dynamic'
@@ -91,6 +92,11 @@ export default async function BusinessPage({ params }: { params: Promise<{ slug:
             {b.claimed && (
               <span className="flex items-center gap-1 rounded-full bg-emerald-500 px-2 py-0.5 text-xs font-semibold text-white">
                 <BadgeCheck size={13} /> Claimed
+              </span>
+            )}
+            {isFeatured(b) && (
+              <span className="flex items-center gap-1 rounded-full bg-amber-400 px-2 py-0.5 text-xs font-semibold text-amber-950">
+                <Star size={13} /> Featured
               </span>
             )}
           </h1>

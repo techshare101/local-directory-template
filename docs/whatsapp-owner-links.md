@@ -45,6 +45,37 @@ The server POSTs JSON:
 Any 2xx response counts as delivered. Use this when you already run a sender
 (n8n workflow, Twilio function, self-hosted Baileys service).
 
+## Option C — Self-hosted sender on Railway (no business account, no Meta approval)
+
+A small Baileys service links your own WhatsApp as a device (QR once) and exposes
+`POST /send`. Verified deployment:
+
+- Code: `C:/Users/valen/Development/wa-sender2` (`sender.mjs`, Express + Baileys rc14)
+- Host: Railway service `isla-wa-sender`, public URL `https://isla-wa-sender-production.up.railway.app`
+- Session: Railway volume `isla-wa-sender-volume` mounted `/data`, `WA_AUTH_DIR=/data/auth/auth`
+- Secret: `WA_SENDER_SECRET` on Railway **and** `WHATSAPP_WEBHOOK_SECRET` on Vercel —
+  requests without `x-webhook-secret` get 401.
+
+```env
+WHATSAPP_WEBHOOK_URL=https://isla-wa-sender-production.up.railway.app/send
+WHATSAPP_WEBHOOK_SECRET=<shared secret>
+```
+
+Operational notes:
+
+- The sender binds `0.0.0.0:$PORT` on Railway (Railway injects `PORT`); locally it
+  binds `127.0.0.1:3011`.
+- `GET /health` → `{connected, me}`. If `connected:false`, the session died
+  (phone logged out the device) and a fresh QR is required.
+- `POST /bootstrap {files:{...}}` seeds the auth dir on a new volume, then exits so
+  the platform restarts with the session loaded.
+- Moving the session: `railway volume files -v <volume-id> upload auth /auth`.
+  A deployment must exist first — uploads fail with "no active deployment".
+- Keep exactly one process connected per session; two clients on the same
+  `creds.json` fight and get disconnected.
+- Cloudflare quick tunnels (`trycloudflare.com`) and `localhost.run` both returned
+  404/502 for this origin — don't spend time there; host the process instead.
+
 ## Behaviour without credentials
 
 `sendOwnerLink()` returns `{ sent: false, detail: "WhatsApp is not configured" }`.
