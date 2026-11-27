@@ -54,9 +54,14 @@ export async function sendOwnerLink(opts: {
   const webhook = process.env.WHATSAPP_WEBHOOK_URL
   if (webhook) {
     try {
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+      // Optional shared secret so the sender can reject spoofed calls.
+      if (process.env.WHATSAPP_WEBHOOK_SECRET) {
+        headers['x-webhook-secret'] = process.env.WHATSAPP_WEBHOOK_SECRET
+      }
       const res = await fetch(webhook, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ to, message, url: opts.url, business: opts.businessName }),
       })
       if (!res.ok) return { sent: false, channel: 'webhook', detail: `Webhook returned ${res.status}` }
