@@ -5,6 +5,7 @@ import { CATEGORY_ORDER } from '@/lib/directory'
 import { SITE } from '@/lib/site.config'
 import { CategoryIcon } from '@/components/icons'
 import { getLocale, pick } from '@/lib/server-locale'
+import { salesWhatsAppHref } from '@/lib/sales-contact'
 import type { Business } from '@/lib/database.types'
 
 export const dynamic = 'force-dynamic'
@@ -283,6 +284,16 @@ export default async function Home() {
           >
             Search the directory
           </Link>
+          {salesWhatsAppHref(`Hola, soy dueño de un negocio en ${SITE.city} y quiero reclamar mi ficha.`) && (
+            <a
+              href={salesWhatsAppHref(`Hola, soy dueño de un negocio en ${SITE.city} y quiero reclamar mi ficha.`)}
+              target="_blank"
+              rel="noreferrer"
+              className="rounded-xl border border-emerald-700 px-6 py-3 text-sm font-semibold text-emerald-100 transition hover:border-emerald-500 hover:text-white"
+            >
+              WhatsApp us
+            </a>
+          )}
         </div>
       </section>
     </div>

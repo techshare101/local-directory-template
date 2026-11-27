@@ -3,6 +3,7 @@ import { ArrowLeft, BadgeCheck, Clock, Eye, MapPin, Megaphone, ShieldCheck } fro
 import { FeatureForm } from './FeatureForm'
 import { FEATURED_PLANS } from '@/lib/featured'
 import { SITE } from '@/lib/site.config'
+import { formatSalesWhatsApp, salesWhatsAppHref } from '@/lib/sales-contact'
 
 export const metadata = {
   title: `Get featured in ${SITE.city}`,
@@ -33,6 +34,9 @@ const BENEFITS = [
 ]
 
 export default function FeaturePage() {
+  const wa = salesWhatsAppHref(`Hola, quiero destacar mi negocio en ${SITE.city}. ¿Cómo funciona?`)
+  const waLabel = formatSalesWhatsApp()
+
   return (
     <div className="mx-auto max-w-4xl space-y-12 py-6">
       <Link href="/" className="inline-flex items-center gap-1 text-sm font-semibold text-emerald-700 hover:underline">
@@ -58,6 +62,16 @@ export default function FeaturePage() {
           >
             Request placement
           </a>
+          {wa && (
+            <a
+              href={wa}
+              target="_blank"
+              rel="noreferrer"
+              className="rounded-xl border border-emerald-500 bg-emerald-950 px-5 py-3 text-sm font-semibold text-emerald-100 transition hover:border-emerald-300 hover:text-white"
+            >
+              WhatsApp us {waLabel}
+            </a>
+          )}
           <span className="rounded-xl border border-emerald-800 px-4 py-3 text-sm text-emerald-200">
             ${FEATURED_PLANS.monthly.price}/month · ${FEATURED_PLANS.quarterly.price}/3 months
           </span>
@@ -126,6 +140,14 @@ export default function FeaturePage() {
           <Clock className="mt-0.5 h-4 w-4 shrink-0" />
           Placement expires on its own — you are never auto-charged and nothing renews silently.
         </p>
+        <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+          <p className="text-sm font-semibold text-slate-900">How payment works</p>
+          <p className="mt-1 text-sm text-slate-600">
+            We confirm availability with you on WhatsApp, then send a payment link (card or bank
+            transfer). You get a receipt on WhatsApp, and your placement goes live within 24 hours of
+            payment. Nothing is charged on this page.
+          </p>
+        </div>
       </section>
 
       {/* Request form */}

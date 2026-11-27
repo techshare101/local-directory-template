@@ -25,6 +25,12 @@ export const SITE = {
   region: 'Puerto Plata Province, Dominican Republic', // footer / SEO area
   domain: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
 
+  // ---- sales contact ------------------------------------------------------
+  // Digits only (country code included). Set NEXT_PUBLIC_SALES_WHATSAPP per
+  // deployment. Empty string hides every WhatsApp CTA instead of shipping a
+  // dead link.
+  salesWhatsApp: process.env.NEXT_PUBLIC_SALES_WHATSAPP || '',
+
   // ---- schema / data ------------------------------------------------------
   // Every table this app reads/writes is `<tablePrefix><table>`. Set it per
   // instance so multiple verticals can share one Supabase project, or one
